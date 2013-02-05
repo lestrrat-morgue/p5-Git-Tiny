@@ -1,0 +1,31 @@
+#!perl
+use strict;
+use Git::Tiny;
+
+my $git = Git::Tiny->new(dir => $ENV{GIT_DIR} || ".git");
+my $object = $git->get_object(shift @ARGV);
+
+if ($object->isa('Git::Tiny::Object::Blob')) {
+    print $object->content;
+} elsif ($object->isa('Git::Tiny::Object::Commit')) {
+    print $object->content;
+} elsif ($object->isa('Git::Tiny::Object::Tree')) {
+    my $entries = $object->entries;
+    foreach my $e (@$entries) {
+        printf "%06d %s %s\t%s\n",
+            $e->mode,
+            "DUMMY", # XXX path to .git is required. currently unimplemented
+            $e->sha1,
+            $e->filename
+    }
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+    # XXX This implementation currently requires you to specify
+    # the complete path to the .git file
+    GIT_DIR=/path/to/git git-cat-file <sha1>
+
+=cut
