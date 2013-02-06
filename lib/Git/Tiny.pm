@@ -102,19 +102,34 @@ sub get_object {
 }
 
 sub format_object {
-    my ($self, $object) = @_;
+    my ($self, $object, $pattern) = @_;
     if ($object->isa('Git::Tiny::Object::Commit')) {
-        # XXX format must be configurable -- unimplemented
-        my $output = join "\n",
-            "commit " . $object->sha1,
-            "Author: " . $object->author,
-            "Date: " . "Unimplemented",
-            "",
-            "    " . $object->content,
-            ""
-        ;
-        return $output;
+        $pattern ||= "commit %H%nAuthor: %an%nDate: %ad%n%n%b%n";
     }
+
+    my $output;
+    while ($pattern && $pattern =~ s/^([^%]*)(%)?//smx) {
+        if ($1) {
+            $output .= $1;
+        }
+        next unless $2;
+
+        # XXX note: try longest candidates first
+        if ($pattern =~ s/^ad//) {
+            $output .= "Unimplemented";
+        } elsif ($pattern =~ s/^an//) {
+            $output .= $object->author;
+        } elsif ($pattern =~ s/^b//) {
+            $output .= $object->content;
+        } elsif ($pattern =~ s/^H//) {
+            $output .= $object->sha1;
+        } elsif ($pattern =~ s/^n//) {
+            $output .= "\n";
+        } else {
+            die "no match $pattern";
+        }
+    }
+    return $output;
 }
 
 1;

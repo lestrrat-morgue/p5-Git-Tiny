@@ -1,5 +1,6 @@
 package Git::Tiny::Cmd;
 use strict;
+use Getopt::Long qw(:config gnu_compat no_auto_abbrev);
 use Git::Tiny;
 use Class::Accessor::Lite
     new => 1,
@@ -37,12 +38,17 @@ sub cmd_log {
     my ($self, @args) = @_;
 
     my $git = $self->get_git();
+    my %opts;
+    local @ARGV = @args;
+    if (! GetOptions(\%opts, "format=s")) {
+        exit 1;
+    }
 
     # XXX need to parse options
     my $ref = shift @ARGV;
     my $commit = $ref ? $git->get_ref("refs/heads/$ref") : $git->get_head();
     while ($commit) {
-        print $git->format_object($commit);
+        print $git->format_object($commit, $opts{format});
 
         my $parent = $commit->parent;
         if ($parent) {
@@ -56,13 +62,22 @@ sub cmd_log {
 sub cmd_show {
     my ($self, @args) = @_;
 
-    my $object = shift @args;
+    local @ARGV = @args;
+    if (! GetOptions(\%opts, "format=s")) {
+        exit 1;
+    }
+
+    my $object = shift @ARGV;
     my $git = $self->get_git();
 
     my $sha1 = $object; # probably need to separete refs and sha1s
     my $object = $git->get_object($sha1);
 
     print $git->format_object($object);
+}
+
+sub cmd_diff {
+    my ($self, @args) = @_;
 }
 
 1;
