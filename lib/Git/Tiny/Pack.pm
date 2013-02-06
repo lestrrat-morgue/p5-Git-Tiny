@@ -18,8 +18,6 @@ sub unpack_object {
     local $/;
     my $content = Compress::Zlib::uncompress(<$fh>);
 
-use Data::Dumper::Concise;
-warn Dumper($content);
     my ($type, $length);
     $content =~ s/\A(\w+)\s+(\d+)\0/$type = $1; $length = $2; ''/msxe;
     if ($type eq 'blob') {
