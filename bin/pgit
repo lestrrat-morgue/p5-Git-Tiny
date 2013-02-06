@@ -1,0 +1,6 @@
+#!perl
+use strict;
+use Git::Tiny::Cmd;
+
+my $cmd = Git::Tiny::Cmd->new();
+$cmd->run();
