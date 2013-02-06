@@ -42,13 +42,7 @@ sub cmd_log {
     my $ref = shift @ARGV;
     my $commit = $ref ? $git->get_ref("refs/heads/$ref") : $git->get_head();
     while ($commit) {
-        # XXX format must be configurable -- unimplemented
-        print "commit ", $commit->sha1, "\n";
-        print "Author: ", $commit->author, "\n";
-        print "Date: ", "Unimplemented", "\n";
-        print "\n";
-        print "    ", $commit->content, "\n";
-
+        print $git->format_object($commit);
 
         my $parent = $commit->parent;
         if ($parent) {
@@ -57,6 +51,18 @@ sub cmd_log {
             undef $commit;
         }
     }
+}
+
+sub cmd_show {
+    my ($self, @args) = @_;
+
+    my $object = shift @args;
+    my $git = $self->get_git();
+
+    my $sha1 = $object; # probably need to separete refs and sha1s
+    my $object = $git->get_object($sha1);
+
+    print $git->format_object($object);
 }
 
 1;

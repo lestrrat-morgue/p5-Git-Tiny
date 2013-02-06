@@ -101,6 +101,22 @@ sub get_object {
     $pack->unpack_object();
 }
 
+sub format_object {
+    my ($self, $object) = @_;
+    if ($object->isa('Git::Tiny::Object::Commit')) {
+        # XXX format must be configurable -- unimplemented
+        my $output = join "\n",
+            "commit " . $object->sha1,
+            "Author: " . $object->author,
+            "Date: " . "Unimplemented",
+            "",
+            "    " . $object->content,
+            ""
+        ;
+        return $output;
+    }
+}
+
 1;
 
 __END__
