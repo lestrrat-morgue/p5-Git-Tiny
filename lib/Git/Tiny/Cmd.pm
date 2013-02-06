@@ -38,9 +38,9 @@ sub cmd_log {
 
     my $git = $self->get_git();
 
-    # XXX need to know what branch we're in -- unimplemented.
-    # just do master for now
-    my $commit = $git->get_ref("refs/heads/master");
+    # XXX need to parse options
+    my $ref = shift @ARGV;
+    my $commit = $ref ? $git->get_ref("refs/heads/$ref") : $git->get_head();
     while ($commit) {
         # XXX format must be configurable -- unimplemented
         print "commit ", $commit->sha1, "\n";

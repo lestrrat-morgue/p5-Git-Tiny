@@ -77,6 +77,21 @@ sub get_ref {
     return $self->get_object( $sha1 );
 }
 
+sub get_head {
+    my ($self) = @_;
+    # XXX Need to encapsulate this?
+    my $path = $self->path_to("HEAD");
+    my $content = do {
+        open my $fh, '<', $path or die;
+        local $/;
+        <$fh>;
+    };
+    die if $@;
+    chomp $content;
+    $content =~ s/^ref:\s+//;
+    $self->get_ref($content);
+}
+
 sub get_object {
     my ($self, $sha1) = @_;
     # XXX deltified objects are not supported yet
