@@ -10,6 +10,19 @@ use Class::Accessor::Lite
 ;
 our $VERSION = '0.01';
 
+sub find_git_dir {
+    my $dir = Cwd::abs_path();
+    while ($dir) {
+        my $git_dir = File::Spec->catdir($dir, ".git");
+        # XXX Can't be enough. check what needs to be checked later.
+        if (-d $git_dir) {
+            return $git_dir;
+        }
+        $dir = Cwd::abs_path(File::Spec->catdir($dir, File::Spec->updir));
+    }
+    return;
+}
+
 sub path_to {
     my $self = shift;
     File::Spec->catfile($self->dir, @_);
